@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.thorugoh.nearby"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.thorugoh.nearby"
