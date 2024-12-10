@@ -117,7 +117,7 @@ private fun NearbyMarketCardPreview() {
         address = "Rua das Flores, 123",
         phone = "(11) 99999-9999",
         cover = "https://via.placeholder.com/300",
-        rules = emptyList()
+//        rules = emptyList()
     ),
         onClick = {}
     )
