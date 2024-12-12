@@ -1,4 +1,4 @@
-package com.thorugoh.nearby.ui.screens
+package com.thorugoh.nearby.ui.screens.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

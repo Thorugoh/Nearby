@@ -4,25 +4,30 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.thorugoh.nearby.data.model.Market
-import com.thorugoh.nearby.ui.screens.HomeScreen
-import com.thorugoh.nearby.ui.screens.MarketDetailsScreen
-import com.thorugoh.nearby.ui.screens.SplashScreen
-import com.thorugoh.nearby.ui.screens.WelcomeScreen
-import com.thorugoh.nearby.ui.screens.route.Home
-import com.thorugoh.nearby.ui.screens.route.Splash
-import com.thorugoh.nearby.ui.screens.route.Welcome
+import com.thorugoh.nearby.ui.route.Home
+import com.thorugoh.nearby.ui.route.QRCodeScanner
+import com.thorugoh.nearby.ui.route.Splash
+import com.thorugoh.nearby.ui.route.Welcome
+import com.thorugoh.nearby.ui.screens.home.HomeScreen
+import com.thorugoh.nearby.ui.screens.home.HomeViewModel
+import com.thorugoh.nearby.ui.screens.market_details.MarketDetailsScreen
+import com.thorugoh.nearby.ui.screens.market_details.MarketDetailsUiEvent
+import com.thorugoh.nearby.ui.screens.market_details.MarketDetailsViewModel
+import com.thorugoh.nearby.ui.screens.qrcode_scanner.QRCodeScannerScreen
+import com.thorugoh.nearby.ui.screens.splash.SplashScreen
+import com.thorugoh.nearby.ui.screens.welcome.WelcomeScreen
 import com.thorugoh.nearby.ui.theme.NearbyTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,6 +37,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             NearbyTheme {
                 val navController = rememberNavController()
+                val homeViewModel by viewModels<HomeViewModel>()
+                val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+
+                val marketDetailsViewModel by viewModels<MarketDetailsViewModel>()
+                val marketDetailsUiState by marketDetailsViewModel.uiState.collectAsStateWithLifecycle()
+
 
                 NavHost(
                     navController = navController,
@@ -51,19 +62,42 @@ class MainActivity : ComponentActivity() {
                         })
                     }
                     composable<Home> {
-                        HomeScreen(onNavigateToMarketDetails = { selectedMarket ->
-                            navController.navigate(selectedMarket)
-                        })
+                        HomeScreen(
+                            onNavigateToMarketDetails = { selectedMarket ->
+                                navController.navigate(selectedMarket)
+                            },
+                            uiState = homeUiState,
+                            onEvent = homeViewModel::onEvent,
+                        )
                     }
                     composable<Market> {
                         val selectedMarket = it.toRoute<Market>()
 
                         MarketDetailsScreen(
                             market = selectedMarket,
+                            uiState = marketDetailsUiState,
+                            onEvent = marketDetailsViewModel::onEvent,
                             onNavigateBack = {
                                 navController.popBackStack()
+                            },
+                            onNavigateToQrCodeScanner = {
+                                navController.navigate(QRCodeScanner)
                             }
                         )
+                    }
+
+                    composable<QRCodeScanner> {
+                        QRCodeScannerScreen(
+                            onCompletedScan = { qrCodeContent ->
+                                if (qrCodeContent.isNotEmpty()) {
+                                    marketDetailsViewModel.onEvent(
+                                        MarketDetailsUiEvent.OnFetchCoupon(
+                                            qrCodeContent = qrCodeContent
+                                        )
+                                    )
+                                }
+                                navController.popBackStack()
+                            })
                     }
                 }
             }

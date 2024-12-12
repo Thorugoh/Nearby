@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.thorugoh.nearby.R
 import com.thorugoh.nearby.data.model.Market
 import com.thorugoh.nearby.ui.theme.Gray100
@@ -60,14 +61,14 @@ fun NearbyMarketCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Image(
+            AsyncImage(
+                model = market.cover,
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
                     .fillMaxWidth(0.3f)
                     .height(IntrinsicSize.Min)
                     .aspectRatio(ratio = 1f, matchHeightConstraintsFirst = true),
                 contentScale = ContentScale.Crop,
-                painter = painterResource(R.drawable.img_burger),
                 contentDescription = "Imagem do estabelecimento"
             )
             Column {
@@ -89,7 +90,7 @@ fun NearbyMarketCard(
                         modifier = Modifier.size(16.dp),
                         tint = if (market.coupons > 0) RedBase else Gray400,
                         painter =
-                            painterResource(id = R.drawable.ic_ticket),
+                        painterResource(id = R.drawable.ic_ticket),
                         contentDescription = "Ícone de cupons"
                     )
                     Text(
@@ -111,7 +112,7 @@ private fun NearbyMarketCardPreview() {
         categoryId = "2",
         name = "Mercado do João",
         description = "Rua das Flores, 123",
-        coupons = 10,
+        coupons = 5,
         latitude = -23.5505199,
         longitude = -46.6333094,
         address = "Rua das Flores, 123",

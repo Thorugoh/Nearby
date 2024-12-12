@@ -15,11 +15,14 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val googleMapsApiKey: String = project.findProperty("GOOGLE_MAPS_API_KEY") as String?
+            ?: throw GradleException("GOOGLE_MAPS_API_KEY is not defined in gradle.properties or as an environment variable.")
+        manifestPlaceholders["googleMapsApiKey"] = googleMapsApiKey
     }
 
     buildTypes {
@@ -54,8 +57,14 @@ android {
 dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.maps.compose)
     implementation(libs.kotlin.serialization)
+
+    implementation(platform((libs.ktor.bom)))
+    implementation(libs.bundles.ktor)
+    implementation(libs.zxing)
+    implementation(libs.zxing.android.embedded)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
