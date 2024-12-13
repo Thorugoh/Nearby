@@ -59,29 +59,30 @@ fun NearbyGoogleMap(modifier: Modifier = Modifier, uiState: HomeUiState) {
         }
 
         if (!uiState.markets.isNullOrEmpty()) {
-            context.getDrawable(R.drawable.ic_map_pin)?.let {
+            context.getDrawable(R.drawable.img_pin)?.let {
                 uiState.marketLocations?.toImmutableList()?.forEachIndexed { index, location ->
                     Marker(
                         state = MarkerState(position = location),
-                        icon = BitmapDescriptorFactory.fromBitmap(it.toBitmap(width = density.run { 36.dp.toPx() }
-                            .roundToInt(), height = density.run { 36.dp.toPx() }.roundToInt())),
-                        title = uiState.markets[index].name
+                        icon = BitmapDescriptorFactory.fromBitmap(
+                            it.toBitmap(
+                                width = density.run { 36.dp.toPx() }.roundToInt(),
+                                height = density.run { 36.dp.toPx() }.roundToInt())),
+                        title = uiState.markets[index].name,
                     )
                 }.also {
                     coroutineScope.launch {
                         val allMarks = uiState.marketLocations?.plus(mockUserLocation)
+
                         val southwestPoint = findSouthwestPoint(allMarks.orEmpty())
                         val northeastPoint = findNortheastPoint(allMarks.orEmpty())
                         val centerPointLatitude =
-                            southwestPoint.latitude + northeastPoint.latitude / 2
+                            (southwestPoint.latitude + northeastPoint.latitude) / 2
                         val centerPointLongitude =
-                            southwestPoint.longitude + northeastPoint.longitude / 2
+                            (southwestPoint.longitude + northeastPoint.longitude) / 2
 
                         val cameraUpdate = CameraUpdateFactory.newCameraPosition(
                             CameraPosition(
-                                LatLng(
-                                    centerPointLatitude, centerPointLongitude
-                                ),
+                                LatLng(centerPointLatitude, centerPointLongitude),
                                 13f,
                                 0f,
                                 0f,
